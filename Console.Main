@@ -1,0 +1,650 @@
+---@diagnostic disable: undefined-global, deprecated
+-- Made by Frix aka Righteous-I
+
+
+local function BypassAntiCheat(args)
+    local Success, Response = pcall(function()
+        for i,v in next, getconnections(game:GetService("ScriptContext").Error) do
+            v:Disable()
+        end
+    end)
+    if not Success then
+        task.wait()
+        BypassAntiCheat()
+    end
+end
+BypassAntiCheat()
+
+local function ConsoleCore()
+    if getgenv().First == nil then
+        getgenv().First = true
+    end
+end
+ConsoleCore()
+
+-- Starting
+rconsolename("Terminal")
+rconsoleprint("\n\n")
+rconsoleprint('@@RED@@')
+rconsoleprint("[!] : New Script Executed\nAmount of execution: ")
+rconsoleprint('@@WHITE@@')
+rconsoleprint("\n")
+rconsoleprint("root@"..game.Players.LocalPlayer.Name.." :~$: ")
+
+--[ DEBUG ]--
+local ErrorsTable = {}
+local AskQuestionSuccess, AskQuestionErrorMessage
+local CheckIfCorrectSuccess, CheckIfCorrectErrorMessage
+local ConsolePrintNameSuccess, ConsolePrintNameErrorMessage
+
+--SUB
+local ElementalAwSpinSuccess, ElementalAwSpinErrorMessage
+local ElementalAwICastSuccess, ElementalAwICastErrorMessage
+
+--[----------------------  [ VARs ]  ----------------------]--
+
+    local FatalErrorDetected = false
+
+    local RuntID
+    local RunStop = false
+
+    local CurrentStringInput = nil
+    local ConstantStringInput = nil
+
+    local LocalUser = game.Players.LocalPlayer
+    local LocalUserId = game.Players.LocalPlayer.UserId
+
+    -- Subs VARs
+    local ChangedName = false
+    local ElementalAwakeing = false
+
+
+    -- Shared VARs
+    getgenv().StopErrorRootInput = false
+    getgenv().StopRootInput = false
+    getgenv().EnabledDebug = false
+    getgenv().IsInThread = false
+
+    getgenv().ConsoleUserString = "root@"..game.Players.LocalPlayer.Name.." :~$: "
+    local ConsoleUserStringLength = getgenv().ConsoleUserString:len()
+
+    ------------------  LOCALs FUNCTIONS  ------------------
+    local AskQuestion
+    local CheckIfCorrect
+
+
+    ------------------  TABLES  ------------------
+    local NumberOfPeopleInGame = 0
+
+
+    ------------------  ELEMENTAL AWAKENING (SUB)  ------------------
+    local WantedMagics = nil
+    local ElementsTableElementalAwakening = {}
+
+
+
+
+--[----------------------  [ MAIN FUNCTIONS ]  ----------------------]--
+
+
+
+
+------------------  SYNTAXES & STRINGS  ------------------
+local function AskQuestion(Type, Question, Color, Warning)
+    AskQuestionSuccess, AskQuestionErrorMessage = pcall(function()
+        game.Worksapce.pla.hi:Destroy()
+        if Type:lower() == "print" then
+            if Warning or tostring(Warning):lower() == "true" then
+                rconsoleprint("\n\n")
+                if Color ~= nil then
+                    rconsoleprint('@@'..Color:upper()..'@@')
+                else
+                    rconsoleprint('@@WHITE@@')
+                end
+                rconsoleprint("[!] : "..Question)
+                rconsoleprint("\n\n")
+            else
+                rconsoleprint("\n\n")
+                if Color ~= nil then
+                    rconsoleprint('@@'..Color:upper()..'@@')
+                else
+                    rconsoleprint('@@WHITE@@')
+                end
+                rconsoleprint(Question)
+                rconsoleprint("\n\n")
+            end
+        end
+    end)
+end
+local function CheckIfCorrect(MinimumLength, MustBe, MustNotBe, Table)
+    CheckIfCorrectSuccess, CheckIfCorrectErrorMessage = pcall(function()
+        if tostring(CurrentStringInput) ~= "" and MinimumLength == nil and MustNotBe == nil and MustBe == nil and Table ~= nil then
+            if tostring(CurrentStringInput) ~= "" then
+                for Index, Value in pairs(Table) do
+                    if tostring(Value:lower()) == tostring(CurrentStringInput:lower()) then
+                        return true
+                    end
+                end
+            end
+        end
+        if tostring(CurrentStringInput) ~= "" and MustBe ~= nil and MustNotBe == nil and Table == nil then
+            if tostring(CurrentStringInput:lower()) == tostring(MustBe:lower()) then
+                return true
+            end
+        end
+        if tostring(CurrentStringInput) ~= "" and MustBe == nil and MustNotBe ~= nil and Table == nil then
+            if tostring(CurrentStringInput:lower()) ~= tostring(MustNotBe:lower()) then
+                return true
+            end
+        end
+    end)
+end
+
+---------------- Utilities
+
+local function LengthTable(Table)
+	local counter = 0 
+	for _, v in pairs(Table) do
+		counter =counter + 1
+	end
+	return counter
+end
+
+local function CheckForErrors()
+    if CheckIfCorrectSuccess ~= nil and not CheckIfCorrectSuccess then
+        FatalErrorDetected = true
+        ErrorsTable["CheckIfCorrect Function"] = {tostring(CheckIfCorrectErrorMessage)}
+    end
+    if AskQuestionSuccess ~= nil and not AskQuestionSuccess then
+        FatalErrorDetected = true
+        ErrorsTable["AskQuestion Function"] = {tostring(AskQuestionErrorMessage)}
+    end
+    if ConsolePrintNameSuccess ~= nil and not ConsolePrintNameSuccess then
+        FatalErrorDetected = true
+        ErrorsTable["ConsolePrintName Function"] = {tostring(ConsolePrintNameErrorMessage)}
+    end
+    if ElementalAwSpinSuccess ~= nil and not ElementalAwSpinSuccess then
+        FatalErrorDetected = true
+        ErrorsTable["ElementalAwSpin Function"] = {tostring(ElementalAwSpinErrorMessage)}
+    end
+    if ElementalAwICastSuccess ~= nil and not ElementalAwICastSuccess then
+        FatalErrorDetected = true
+        ErrorsTable["ElementalAwICast Function"] = {tostring(ElementalAwICastErrorMessage)}
+    end
+end
+
+local function ConsolePrintName()
+    ConsolePrintNameSuccess, ConsolePrintNameErrorMessage = pcall(function()
+        if not getgenv().StopRootInput then
+            if getgenv().EnabledDebug then
+                AskQuestion("print", "StopRootInput is disabled", "red", true)
+            end
+            if ChangedName then
+                rconsoleprint('@@WHITE@@')
+                rconsoleprint("root@"..ConsoleUserString.." :~$: ")
+            else
+                rconsoleprint('@@WHITE@@')
+                rconsoleprint(ConsoleUserString)
+            end
+        else
+            if getgenv().EnabledDebug then
+                AskQuestion("print", "StopRootInput is now enabled", "red", true)
+            end
+        end
+    end)
+end
+
+
+local function ReFreshNumberOfPeople()
+    NumberOfPeopleInGame = #game:GetService("Players"):GetChildren()
+end
+
+local function SequentialQuestion(QuestionTable, Time, MultipleAnswerCount)
+    local TimeEntry = tick()
+    local Answers
+    repeat
+        Answers = CurrentStringInput
+        if _G.NewExecution then
+            break
+        end
+        if not Time == nil and (tick()-TimeEntry >= Time) then
+            break
+        end
+        game:GetService("RunService").RenderStepped:Wait()
+    until CheckIfCorrect(nil, nil, nil, ElementsTableElementalAwakening) == true
+    if Answers == nil then
+       return "time"
+    else
+        return Answers
+    end
+end
+
+---------------- Core
+
+local function ElementalAwakeningSpinFunction()
+    ElementalAwSpinSuccess, ElementalAwSpinErrorMessage = pcall(function()
+        spawn(function()
+            local YieldStr = CurrentStringInput
+            local StopLoop = false
+            AskQuestion("print", "Wanted Magic ?", "RED", true)
+            getgenv().StopErrorRootInput = true
+            rconsoleprint('@@WHITE@@')
+            ConsolePrintName()
+            WantedMagics = CurrentStringInput
+            repeat
+                WantedMagics = CurrentStringInput
+                if getgenv().NewExecution then
+                    break
+                end
+                game:GetService("RunService").RenderStepped:Wait()
+            until CheckIfCorrect(nil, nil, nil, ElementsTableElementalAwakening) == true
+            if getgenv().NewExecution then
+                return
+            end
+            AskQuestion("print", tostring(WantedMagics.." Has been set."), "BLUE", true)
+            local WantedMagics = CurrentStringInput
+            getgenv().StopRootInput = true
+                rconsoleprint("\n")
+                while true do
+                    if getgenv().NewExecution then
+                        break
+                    end
+                    local Magic, Rarity = game:GetService("ReplicatedStorage").Events.Spin:InvokeServer(false)
+                    if WantedMagics == tostring(Magic) then
+                        rconsoleprint("\n")
+                        rconsoleprint('@@RED@@')
+                        rconsoleprint("[!] : Rolled one of the wanted magic : "..Magic)
+                        rconsoleprint("\n")
+                            getgenv().StopRootInput = false
+                        break
+                    end
+                    if string.sub(YieldStr:lower(), 1, 4) == "canc" or string.sub(YieldStr:lower(), 1, 6) == "cancel" then
+                        break 
+                    end
+                    if Magic ~= nil and Rarity ~= nil then
+                        if Rarity == "Exotic" or Rarity == "Legendary" or Rarity == "Heavenly" then
+                            getgenv().StopRootInput = false
+                            local Stopped = true
+                            rconsoleprint("\n")
+                            rconsoleprint('@@RED@@')
+                            rconsoleprint("[!] : Rolled a "..Rarity.." magic : "..Magic)
+                            rconsoleprint("\n")
+                            AskQuestion("print", "Do you want to continue spinning ? Y/N (Say Y to continue and N to stop)", "RED", true)
+                            ConsolePrintName()
+                            repeat
+                                if CheckIfCorrect(nil, "N") == true then
+                                    StopLoop = true
+                                    AskQuestion("print", "Stopped Loop", "RED", true)
+                                    break
+                                end
+                                if CheckIfCorrect(nil, "Y") == true then
+                                    AskQuestion("print", "Continuing Spinning", "RED", true)
+                                    Stopped = false
+                                end
+                                wait()
+                            until Stopped == false
+                            Stopped = true
+                            getgenv().StopRootInput = true
+                        end
+                        if StopLoop then
+                            break
+                        end
+                        rconsoleprint("\n")
+                        rconsoleprint('@@GREEN@@')
+                        rconsoleprint("[!] : --------------------------------------------------------------")
+                        rconsoleprint("\n")
+                        rconsoleprint('@@GREEN@@')
+                        rconsoleprint("     Rolled    :     "..Magic.."\n")
+                        rconsoleprint('@@GREEN@@')
+                        rconsoleprint("     Rarity    :                "..Rarity.."\n")
+                        rconsoleprint("\n")
+                    else
+                        rconsoleprint("\n")
+                        rconsoleprint('@@GREEN@@')
+                        rconsoleprint("[!] : --------------------------------------------------------------")
+                        rconsoleprint("\n\n")
+                        rconsoleprint('@@RED@@')
+                        rconsoleprint("[!] :                       NO SPINS LEFT")
+                        rconsoleprint("\n\n")
+                        getgenv().StopRootInput = false
+                        break
+                    end
+                    game:GetService("RunService").RenderStepped:Wait()
+                end
+                if game.Players.LocalPlayer.Character then
+                    game.Players.LocalPlayer.Character:BreakJoints()
+                end
+            rconsoleprint("\n")
+            getgenv().StopRootInput = false
+            getgenv().StopErrorRootInput = false
+            ConsolePrintName()
+        end)
+    end)
+end
+
+local function ElementalAwakeningInstantCastFunction()
+    ElementalAwICastSuccess, ElementalAwICastErrorMessage = pcall(function()
+        local DataStuff = {
+            MagicCircle = tostring(game:GetService("ReplicatedStorage").Data[LocalUserId].Magic.Value),
+            CanMove = true,
+            MaxChargeEndlag = 0,
+            MaxCharge = 0,
+            CastTime = 0,
+            EndLag = 0
+        }
+        
+        
+        local Players = game:GetService('Players')
+        local ReplicatedStorage = game:GetService('ReplicatedStorage')
+        local Player = Players.LocalPlayer
+        local SpellLibrary = require(ReplicatedStorage.SpellLibrary)
+        
+        local function ManipulateTool(Tool)
+        local Name = Tool.Name:gsub(' %(.+', '')
+        local Info = SpellLibrary[Name]
+        
+        for Property, Value in pairs(DataStuff) do
+            if rawget(Info, Property) then
+                rawset(Info, Property, Value)
+            end
+        end
+        end
+        
+        if game.Players.LocalPlayer.Character ~= nil then
+                if game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                for _, Tool in pairs(Player.Character:GetChildren()) do
+                    if Tool:IsA('Tool') then
+                        ManipulateTool(Tool)
+                    end
+                end
+                for _, Tool in pairs(Player.Backpack:GetChildren()) do
+                    ManipulateTool(Tool)
+                end
+            else
+                rconsoleprint("\n")
+                rconsoleprint('@@RED@@')
+                rconsoleprint("[!] : Error encountered with the Elemental Awakening Instant Cast Function [Player root part not founded]")
+                rconsoleprint("\n")
+            end
+        else
+            rconsoleprint("\n")
+            rconsoleprint('@@RED@@')
+            rconsoleprint("[!] : Error encountered with the Elemental Awakening Instant Cast Function [Player character has not spawned]")
+            rconsoleprint("\n")
+        end
+    end)
+end
+
+local function ExecuteComponent(YieldString)
+    if string.sub(YieldString:lower(), 1, 13) == "/e elawkicast" or string.sub(YieldString:lower(), 1, 14) == "/e elawk icast" then
+        if ElementalAwakeing then
+            ElementalAwakeningInstantCastFunction()
+        end
+    elseif string.sub(YieldString:lower(), 1, 12) == "/e elawkspin" or string.sub(YieldString:lower(), 1, 13) == "/e elawk spin"  then
+        if ElementalAwakeing then
+            ElementalAwakeningSpinFunction()
+        end
+    end
+end
+
+local function LoadComponent(YieldString)
+    if string.sub(YieldString:lower(), 1, 8) == "/l elawk" or string.sub(YieldString:lower(), 1, 11) == "/load elawk" then
+        local ElementalWarning = messagebox("This game doee not support Elemental Awakening Component\nDo you really want to execute it ?", "Warning !", 1)
+        if game.GameId ~= 2671916716 then
+            if ElementalWarning == 1 then
+                AskQuestion("print", "Unlocked Elemental Awakeing", "blue", true)
+                ElementalAwakeing = true
+            else
+                AskQuestion("print", "Cancelled Elemental Awakeing Execution", "blue", true)
+            end
+        end
+    end
+end
+----------------------------------------------------------------------------------------------------------------------- > A FINIR ->
+local function DeveloperCommands(YieldString)
+    local FirtPathName
+    if string.sub(YieldString:lower(), 1, 12) == "/d gdinspect " then
+        getgenv().IsInThread = true
+        AskQuestion("print", "Path Name ?", "RED", true)
+        getgenv().StopErrorRootInput = true
+        rconsoleprint('@@WHITE@@')
+        ConsolePrintName()
+        repeat
+            WantedMagics = CurrentStringInput
+            game:GetService("RunService").RenderStepped:Wait()
+        until CheckIfCorrect(nil, nil, nil, ElementsTableElementalAwakening) == true
+        for Index, Value in next, string.sub(YieldString:lower(), 13):GetDescendants() do
+            if Value.Name == "NIL" then
+                
+            end
+        end
+        getgenv().IsInThread = false
+    end
+end
+
+local function CommandsExecutable(YieldString)
+    do
+        warn(tostring(CurrentStringInput))
+        warn("S: "..tostring(ConstantStringInput))
+        if string.sub(YieldString:lower(), 1, 5) == "clear" or string.sub(YieldString:lower(), 1, 3) == "clr" then
+            rconsoleclear()
+        elseif string.sub(YieldString:lower(), 1, 4) == "help" then
+            rconsoleprint("\n")
+            rconsoleprint("Please make the console full screen (this window)\n\n")
+            task.wait(1)
+            rconsoleprint("   [ clr | clear ]                      ---> Clear the console (clear the strings)\n")
+            rconsoleprint("   [ randomtp | rdmtp ]                 ---> Randomly teleport yourself to someone (Random Teleport)\n")
+            rconsoleprint("   [ goto $playerName ]                 ---> Teleport yourself to the player with his name (ex: goto william)\n")
+            rconsoleprint("   [ pplayers ]                         ---> Print all the players in the server on the console (Print players names)\n")
+            rconsoleprint("   [ timexecuted | texecuted ]          ---> Print how many times you have executed the script (Mainly used to help me to fix errors)\n")
+            rconsoleprint("   [ rj | rejoin ]                      ---> Rejoin the server (Rejoin the exact server you were in)\n")
+            rconsoleprint("   [ name $name ]                       ---> Change the console root name (ex: name Willy -> root@Willy :~$ )\n")
+            rconsoleprint("   [ clicktp ]                          ---> Ctrl + Click Teleport (Safe Version -> Will only teleport you if you've clicked on a part)\n")
+            rconsoleprint("   [ debug ]                     ---> Print on the roblox console if functions are working or not\n")
+            rconsoleprint("   [ /l $ComponentName | /load $ComponentName ]     ---> load commands related to a roblox game (ex: /load elawk -> load elemental awakening commands that can be used with /e $ComponentName); /l help can be used\n")
+            rconsoleprint("   [ /e $ComponentName | /execute $ComponentName ]  ---> Execute a command related to a roblox game (ex: /e elawk spin -> execute elemental awakening spin function); /e help can be used\n")
+            rconsoleprint("\n")
+        elseif string.sub(YieldString:lower(), 1, 8) == "randomtp" or string.sub(YieldString:lower(), 1, 5) == "rdmtp" then
+            local Randomiser = math.random(1, #game:GetService("Players"):GetChildren())
+            for Index, Value in next, game.Players:GetChildren() do
+                if Index == Randomiser then
+                    if Value ~= nil then
+                        local Success, Reason = pcall(function()
+                            game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = Value.Character:FindFirstChild("HumanoidRootPart").CFrame
+                        end)
+                        if not Success then
+                            if Reason ~= nil and tostring(Reason) ~= "" then
+                                rconsoleprint("\n")
+                                rconsoleprint('@@RED@@')
+                                rconsoleprint("[!] : Error encountered with the teleportation : "..tostring(Reason))
+                                rconsoleprint("\n")
+                            else
+                                rconsoleprint("\n")
+                                rconsoleprint('@@RED@@')
+                                rconsoleprint("[!] : Error encountered with the teleportation")
+                                rconsoleprint("\n")
+                            end
+                        end
+                    end
+                end
+            end
+        elseif string.sub(YieldString:lower(), 1, 5) == "goto " then
+            local SetPlayer = nil
+            for Index, Player in ipairs(game:GetService("Players"):GetPlayers()) do
+                if string.sub(Player.Name:lower(), 1, string.len(string.sub(YieldString, 6))) == string.sub(YieldString:lower(), 6) then
+                    SetPlayer = Player.Name
+                end
+            end
+            rconsoleprint("\n")
+            if SetPlayer ~= nil then
+                if game:GetService("Players"):FindFirstChild(SetPlayer) then
+                    if game:GetService("Players"):FindFirstChild(SetPlayer).Character then
+                        if game:GetService("Players").LocalPlayer.Character then
+                            game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = game:GetService("Players"):FindFirstChild(SetPlayer).Character:FindFirstChild("HumanoidRootPart").CFrame
+                        end
+                    end
+                end
+            end
+            rconsoleprint("\n")
+        elseif string.sub(YieldString:lower(), 1, 8) == "pplayers" then
+            for Index, Player in ipairs(game:GetService("Players"):GetPlayers()) do
+                if Player ~= nil then
+                    rconsoleprint("\n")
+                    rconsoleprint('@@BLUE@@')
+                    rconsoleprint(Player.Name)
+                    rconsoleprint("\n")
+                end
+            end
+        elseif string.sub(YieldString:lower(), 1, 13) == "timesexecuted" or string.sub(YieldString:lower(), 1, 9) == "texecuted" then
+            rconsoleprint(getgenv().TimesExecuted)
+            rconsoleprint("\n")
+        elseif string.sub(YieldString:lower(), 1, 2) == "rj" or string.sub(YieldString:lower(), 1, 6) == "rejoin" then
+            game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, game:GetService("Players").LocalPlayer)
+            rconsoleprint("\n")
+        elseif string.sub(YieldString:lower(), 1, 5) == "name " then
+            ConsoleUserString = string.sub(YieldString, 6)
+            ChangedName = true
+            rconsoleprint("\n")
+        elseif string.sub(YieldString:lower(), 1, 13) == "terminalname " then
+            rconsolename(string.sub(YieldString, 14))
+            rconsoleprint("\n")
+        elseif string.sub(YieldString:lower(), 1, 7) == "clicktp" then
+            local Mouse = game.Players.LocalPlayer:GetMouse()
+            Mouse.Button1Down:connect(function()
+                if not game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.LeftControl) then
+                    return
+                end
+                if not Mouse.Target then
+                    return
+                end
+    	        game.Players.LocalPlayer.Character:MoveTo(Mouse.Hit.p)
+            end)
+            rconsoleprint("\n")
+        elseif string.sub(YieldString:lower(), 1, 12) == "debug" then
+            getgenv().EnabledDebug = not getgenv().EnabledDebug
+            if getgenv().EnabledDebug then
+                AskQuestion("print", "Enabled Debug", "blue", true)
+            else
+                AskQuestion("print", "Disabled Debug", "blue", true)
+            end
+        elseif string.sub(YieldString:lower(), 1, 3) == "/d " or string.sub(YieldString:lower(), 1, 5) == "/dev " then
+            DeveloperCommands(YieldString)
+            rconsoleprint("\n")
+        elseif string.sub(YieldString:lower(), 1, 3) == "/e " or string.sub(YieldString:lower(), 1, 9) == "/execute " then
+            ExecuteComponent(YieldString)
+            rconsoleprint("\n")
+        elseif string.sub(YieldString:lower(), 1, 3) == "/l " or string.sub(YieldString:lower(), 1, 6) == "/load " then
+            LoadComponent(YieldString)
+            rconsoleprint("\n")
+        else
+            if not getgenv().StopErrorRootInput then
+                rconsoleprint('@@RED@@')
+                rconsoleprint("[!] : '"..YieldString.."' is not a valid command.\n(Say -> 'help' to get all the commands)")
+                rconsoleprint("\n\n")
+            end
+        end
+    end
+end
+
+---------------- Core Loops
+
+spawn(function()
+    while true do
+        coroutine.wrap(function()
+            CheckForErrors()
+        end)()
+        if not FatalErrorDetected then
+            local YieldString = rconsoleinput()
+            if (YieldString ~= "") and not (YieldString:match("^%s*$")) then
+                CurrentStringInput = YieldString                            -- DEL  > 0.1s
+                ConstantStringInput = YieldString                   -- NDEL > ∞ | REFRESH
+                CommandsExecutable(YieldString)
+            end
+            if YieldString then
+                ConsolePrintName()
+            end
+            coroutine.wrap(function()
+                CurrentStringInput = ""
+                task.wait(0.1)
+            end)()
+            if not (RuntID == getgenv().TimesExecuted) then
+                warn("BROKE LOOP OF SCRIPT NUMBER "..getgenv().TimesExecuted)
+                RunStop = true
+                break
+            end
+        else
+            RunStop = true
+            rconsoleprint("\n\n"..LengthTable(ErrorsTable).." FATAL ERROR(s):\n")
+            for i, v in next, ErrorsTable do
+                for x, n in next, v do
+                    rconsoleprint("["..i.."] STOPPED WORKING FOR THE FOLLWING REASON: "..n.."\n")
+                end
+            end
+            task.wait(1)
+            rconsoleprint("\n\nATTEMPTING TO RESTART THE CONSOLE..")
+            task.wait(1)
+            local RestartConsoleWarning = messagebox("The Console Crashed,\nDo you want to restart it ?", "Warning !", 1)
+            if RestartConsoleWarning == 1 then
+                rconsoleprint("\nRESTARTING CONSOLE..")
+                task.wait(1)
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/Righteous-I/Intersection/main/Console.Main"), true)()
+            else
+                rconsoleclear()
+            end
+            break
+        end
+        game:GetService("RunService").Heartbeat:Wait()
+    end
+end)
+
+---------------- Anti loops bug
+
+if not getgenv().NewExecution or getgenv().NewExecution == nil then
+    if getgenv().First == false then
+        if getgenv().TimesExecuted == nil then
+            getgenv().TimesExecuted = 1
+        end
+        getgenv().TimesExecuted = getgenv().TimesExecuted + 1
+        RuntID = getgenv().TimesExecuted
+    end
+end
+
+---------------- Anti Bug
+
+if getgenv().First then
+    getgenv().First = false
+end
+
+local function Initialize()
+    NumberOfPeopleInGame = #game:GetService("Players"):GetChildren()
+    local X = game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(State)
+        if State == Enum.TeleportState.Started then
+            --syn.queue_on_teleport() ------------------------------------------------------------------------------------------------ SYN.TEL.B2
+            X:Disconnect()
+        end
+    end)
+end
+
+Initialize() -- Initial vars setting and tables setting
+
+--[[ 
+    
+    -- DEPRECATED ----------------------------------------------------------------
+
+    CODE BELOW IS TEMPORARY OR DEPRECATED.
+    THE CODE MIGHT BE REMOVED, REPLACED OR UPDATED AT ANY TIME.
+    PLEASE KEEP IN MIND THAT THE CODE BELOW MIGHT BE VERY OLD, USING IT MIGHT BREAK SOME FUNCTIONS.
+
+    -- END -----------------------------------------------------------------------
+
+    local Languag
+
+    local function Traduct(Language, Keyword)
+    
+    end
+
+    if game.GameId == 2671916716 then
+        for i, v in pairs(game:GetService("ReplicatedStorage").Effects.MagicCircles:GetChildren()) do if v:IsA("MeshPart") then table.insert(ElementsTableElementalAwakening, v.Name) end end
+    end
+
+]]--
