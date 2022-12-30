@@ -565,7 +565,6 @@ spawn(function()
                 task.wait(0.1)
             end)()
             if not (RunID == getgenv().TimesExecuted) then
-                warn("BROKE LOOP OF SCRIPT NUMBER "..getgenv().TimesExecuted)
                 RunStop = true
                 break
             end
