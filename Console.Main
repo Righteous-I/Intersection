@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global, deprecated
--- Made by Frix
+-- Made by Frix aka Righteous-I
 
 local function BypassAntiCheat(args)
     local Success, Response = pcall(function()
