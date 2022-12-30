@@ -587,7 +587,7 @@ spawn(function()
             if RestartConsoleWarning == 1 then
                 rconsoleprint("\nRESTARTING CONSOLE..")
                 task.wait(1)
-                loadstring(game:HttpGet("https://raw.githubusercontent.com/Righteous-I/Intersection/main/Console.Main"), true)()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/Righteous-I/Intersection/main/Console.Main"))()
             else
                 rconsoleclear()
             end
