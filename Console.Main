@@ -1,5 +1,4 @@
 ---@diagnostic disable: undefined-global, deprecated
--- Made by Frix aka Righteous-I
 
 local function BypassAntiCheat(args)
     local Success, Response = pcall(function()
@@ -586,7 +585,7 @@ spawn(function()
             if RestartConsoleWarning == 1 then
                 rconsoleprint("\nRESTARTING CONSOLE..")
                 task.wait(1)
-                loadstring(game:HttpGet("https://raw.githubusercontent.com/Righteous-I/Intersection/main/Console.Main"))
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/Righteous-I/Intersection/main/Console.Main"), true)()
             else
                 rconsoleclear()
             end
