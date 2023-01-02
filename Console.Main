@@ -17,25 +17,25 @@ BypassAntiCheat()
 
 local function ConsoleCore()
     if getgenv().First == nil then
+        warn("WAS NIL")
         getgenv().First = true
     end
+    -- Starting
+    rconsolename("Terminal")
+    rconsoleprint("\n\n")
+    rconsoleclear()
+    rconsoleprint('@@RED@@')
+    rconsoleprint("[!] : New Script Executed")
+    if getgenv().TimesExecuted ~= nil then
+        rconsoleprint("\n[?] : Script made by Frix aka Righteous-I\nAmount of execution: "..getgenv().TimesExecuted)
+    else
+        rconsoleprint("\n[?] : Script made by Frix aka Righteous-I\nAmount of execution: 1")
+    end
+    rconsoleprint('@@WHITE@@')
+    rconsoleprint("\n\n")
+    rconsoleprint("terminal@"..getgenv().ConsoleUserString.." $> ")
 end
 ConsoleCore()
-
--- Starting
-rconsolename("Terminal")
-rconsoleprint("\n\n")
-rconsoleclear()
-rconsoleprint('@@RED@@')
-rconsoleprint("[!] : New Script Executed")
-if getgenv().TimesExecuted ~= nil then
-    rconsoleprint("\n[?] : Script made by Frix aka Righteous-I\nAmount of execution: "..getgenv().TimesExecuted)
-else
-    rconsoleprint("\n[?] : Script made by Frix aka Righteous-I\nAmount of execution: 1")
-end
-rconsoleprint('@@WHITE@@')
-rconsoleprint("\n\n")
-rconsoleprint("root@"..game.Players.LocalPlayer.Name.." :~$: ")
 
 --[ DEBUG ]--
 local ErrorsTable = {}
@@ -43,6 +43,7 @@ local AskQuestionSuccess, AskQuestionErrorMessage
 local CheckIfCorrectSuccess, CheckIfCorrectErrorMessage
 local ConsolePrintNameSuccess, ConsolePrintNameErrorMessage
 local CommandsSuccess, CommandsErrorMessage
+local ConsoleSettingsSuccess, ConsoleSettingsErrorMessage
 
 --SUB
 local ElementalAwSpinSuccess, ElementalAwSpinErrorMessage
@@ -52,10 +53,13 @@ local ElementalAwICastSuccess, ElementalAwICastErrorMessage
 
     local FatalErrorDetected = false
 
+    local RunVersion = 0.1
     local RunID
     local RunStop = false
 
     local InThread = false
+    local CurrentThread = ""
+    local UserStringTemp = "terminal@"..CurrentThread.." $> "
     local CurrentStringInput = nil
     local ConstantStringInput = nil
 
@@ -65,7 +69,7 @@ local ElementalAwICastSuccess, ElementalAwICastErrorMessage
     -- Subs VARs
     local ElementalAwakeing = false
 
-
+    print("V: "..tostring(getgenv().First))
     -- Shared VARs
     if getgenv().First then
         getgenv().StopErrorRootInput = false
@@ -73,7 +77,7 @@ local ElementalAwICastSuccess, ElementalAwICastErrorMessage
         getgenv().EnabledDebug = false
         getgenv().IsInThread = false
 
-        getgenv().ConsoleUserString = "root@"..game.Players.LocalPlayer.Name.." :~$: "
+        getgenv().ConsoleUserString = "terminal@"..game.Players.LocalPlayer.Name.." $> "
         getgenv().ChangedName = false
     end
     local ConsoleUserStringLength = getgenv().ConsoleUserString:len()
@@ -186,6 +190,10 @@ local function CheckForErrors()
         FatalErrorDetected = true
         ErrorsTable["Commands Function"] = {tostring(CommandsErrorMessage)}
     end
+    if ConsoleSettingsSuccess ~= nil and not ConsoleSettingsSuccess then
+        FatalErrorDetected = true
+        ErrorsTable["Console Settings Function"] = {tostring(ConsoleSettingsErrorMessage)}
+    end
 end
 
 local function ConsolePrintName()
@@ -194,12 +202,17 @@ local function ConsolePrintName()
             if getgenv().EnabledDebug then
                 AskQuestion("print", "StopRootInput is disabled", "red", true)
             end
-            if getgenv().ChangedName then
-                rconsoleprint('@@WHITE@@')
-                rconsoleprint("root@"..getgenv().ConsoleUserString.." :~$: ")
+            if not InThread then
+                if getgenv().ChangedName then
+                    rconsoleprint('@@WHITE@@')
+                    rconsoleprint("terminal@"..getgenv().ConsoleUserString.." $> ")
+                else
+                    rconsoleprint('@@WHITE@@')
+                    rconsoleprint(getgenv().ConsoleUserString)
+                end
             else
                 rconsoleprint('@@WHITE@@')
-                rconsoleprint(getgenv().ConsoleUserString)
+                rconsoleprint("terminal@"..CurrentThread.." $> ")
             end
         else
             if getgenv().EnabledDebug then
@@ -428,7 +441,7 @@ local function HelpCommand()
     rconsoleprint("   [ pplayers ]                         ---> Print all the players in the server on the console (Print players names)\n")
     rconsoleprint("   [ timexecuted | texecuted ]          ---> Print how many times you have executed the script (Mainly used to help me to fix errors)\n")
     rconsoleprint("   [ rj | rejoin ]                      ---> Rejoin the server (Rejoin the exact server you were in)\n")
-    rconsoleprint("   [ name $name ]                       ---> Change the console root name (ex: name Willy -> root@Willy :~$ )\n")
+    rconsoleprint("   [ name $name ]                       ---> Change the console root name (ex: name Willy -> terminal@Willy $> )\n")
     rconsoleprint("   [ clicktp ]                          ---> Ctrl + Click Teleport (Safe Version -> Will only teleport you if you've clicked on a part)\n")
     rconsoleprint("   [ debug ]                     ---> Print on the roblox console if functions are working or not\n")
     rconsoleprint("   [ /l $ComponentName | /load $ComponentName ]     ---> load commands related to a roblox game (ex: /load elawk -> load elemental awakening commands that can be used with /e $ComponentName); /l help can be used\n")
@@ -527,8 +540,24 @@ local function DeveloperCommands(YieldString)
     end
 end
 
-local function ConsoleSettings()
-    
+local function ConsoleSettings(YieldString)
+    ConsoleSettingsSuccess, ConsoleSettingsErrorMessage = pcall(function()
+        if string.sub(YieldString:lower(), 1, 13) == "terminalname " then
+            rconsolename(string.sub(YieldString, 14))
+            rconsoleprint("\n")
+        elseif string.sub(YieldString:lower(), 1, 6) == "return" then
+            CurrentThread = ""
+            InThread = false
+            rconsoleprint("\n")
+        else
+            print("MOB:: "..YieldString)
+            if not getgenv().StopErrorRootInput then
+                rconsoleprint('@@RED@@')
+                rconsoleprint("[!] : '"..YieldString.."' is not a valid command.\n(Say -> 'help' to get all the commands)")
+                rconsoleprint("\n\n")
+            end
+        end
+    end)
 end
 
 local function ConsoleCommands(YieldString)
@@ -552,9 +581,6 @@ local function ConsoleCommands(YieldString)
             getgenv().ConsoleUserString = string.sub(YieldString, 6)
             getgenv().ChangedName = true
             rconsoleprint("\n")
-        elseif string.sub(YieldString:lower(), 1, 13) == "terminalname " then
-            rconsolename(string.sub(YieldString, 14))
-            rconsoleprint("\n")
         elseif string.sub(YieldString:lower(), 1, 7) == "clicktp" then
             ClickTeleportCommand()
         elseif string.sub(YieldString:lower(), 1, 5) == "debug" then
@@ -573,9 +599,14 @@ local function ConsoleCommands(YieldString)
         elseif string.sub(YieldString:lower(), 1, 3) == "/l " or string.sub(YieldString:lower(), 1, 6) == "/load " then
             LoadComponent(YieldString)
             rconsoleprint("\n")
+        elseif string.sub(YieldString:lower(), 1, 7) == "version" then
+            rconsoleprint("CURRENT VERSION: "..RunVersion.."\n\n")
         elseif string.sub(YieldString:lower(), 1, 8) == "settings" then
-            ConsoleSettings(YieldString)
+            CurrentThread = "settings"
+            InThread = true
+            rconsoleprint("\n")
         else
+            print("MOBAI: "..YieldString)
             if not getgenv().StopErrorRootInput then
                 rconsoleprint('@@RED@@')
                 rconsoleprint("[!] : '"..YieldString.."' is not a valid command.\n(Say -> 'help' to get all the commands)")
@@ -595,10 +626,14 @@ spawn(function()
         if not FatalErrorDetected then
             local YieldString = rconsoleinput()
             if (YieldString ~= "") and not (YieldString:match("^%s*$")) then
-                CurrentStringInput = YieldString                            -- DEL  > 0.1s
+                CurrentStringInput = YieldString                    -- DEL  > 0.1s
                 ConstantStringInput = YieldString                   -- NDEL > ∞ | REFRESH
                 if not InThread then
                     ConsoleCommands(YieldString)
+                else
+                    if CurrentThread == "settings" then
+                        ConsoleSettings(YieldString)
+                    end
                 end
             end
             if YieldString then
