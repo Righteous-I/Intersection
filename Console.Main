@@ -1,7 +1,7 @@
 -- Made by Frix aka Righteous-I
 --[[ NOTE: 
     (14/01/2023) - SCRIPT WILL NO LONGER BE UPDATED UNTIL THE REWORK HAVE BEEN EFFECTED [-Frix]
-
+	-> The rework will make the script easier to work on, it will fix major issues (Sync/Execution/Detection and More..), aswell as the code will get a new structure to make the code better to look at.
 ]]
 
 local function BypassAntiCheat()
